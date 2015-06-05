@@ -1,0 +1,1 @@
+xcopy PubSubClient %HOMEDRIVE%%HOMEPATH%\Documents\Arduino\libraries\PubSubClient\ /e/y
