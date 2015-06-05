@@ -28,7 +28,12 @@ void callback(char* topic, byte* payload, unsigned int length);
 
 EthernetClient ethClient;
 WebSocketClient webSocketClient;
-PubSubClient client(server, port, callback, ethClient);
+ 
+webSocketClient.path = "/mqtt";
+webSocketClient.host = server;
+webSocketClient.protocol = "mqtt";
+  
+PubSubClient client(server, port, callback, ethClient, webScoketClient);
 
 // Callback function
 void callback(char* topic, byte* payload, unsigned int length) {
