@@ -7,13 +7,15 @@
 #include "PubSubClient.h"
 #include <string.h>
 
+
 PubSubClient::PubSubClient() {
    this->_client = NULL;
    this->stream = NULL;
 }
 
-PubSubClient::PubSubClient(uint8_t *ip, uint16_t port, void (*callback)(char*,uint8_t*,unsigned int), Client& client) {
-   this->_client = &client;
+PubSubClient::PubSubClient(uint8_t *ip, uint16_t port, void (*callback)(char*,uint8_t*,unsigned int), Client& client, WebSocketClient& webSocketClient) {
+   this->_client = &client;   
+   this->webSocketClient = &webSocketClient;
    this->callback = callback;
    this->ip = ip;
    this->port = port;
@@ -21,16 +23,18 @@ PubSubClient::PubSubClient(uint8_t *ip, uint16_t port, void (*callback)(char*,ui
    this->stream = NULL;
 }
 
-PubSubClient::PubSubClient(char* domain, uint16_t port, void (*callback)(char*,uint8_t*,unsigned int), Client& client) {
+PubSubClient::PubSubClient(char* domain, uint16_t port, void (*callback)(char*,uint8_t*,unsigned int), Client& client, WebSocketClient& webSocketClient) {
    this->_client = &client;
+   this->webSocketClient = &webSocketClient;
    this->callback = callback;
    this->domain = domain;
    this->port = port;
    this->stream = NULL;
 }
 
-PubSubClient::PubSubClient(uint8_t *ip, uint16_t port, void (*callback)(char*,uint8_t*,unsigned int), Client& client, Stream& stream) {
+PubSubClient::PubSubClient(uint8_t *ip, uint16_t port, void (*callback)(char*,uint8_t*,unsigned int), Client& client, Stream& stream, WebSocketClient& webSocketClient) {
    this->_client = &client;
+   this->webSocketClient = &webSocketClient;
    this->callback = callback;
    this->ip = ip;
    this->port = port;
@@ -38,8 +42,9 @@ PubSubClient::PubSubClient(uint8_t *ip, uint16_t port, void (*callback)(char*,ui
    this->stream = &stream;
 }
 
-PubSubClient::PubSubClient(char* domain, uint16_t port, void (*callback)(char*,uint8_t*,unsigned int), Client& client, Stream& stream) {
+PubSubClient::PubSubClient(char* domain, uint16_t port, void (*callback)(char*,uint8_t*,unsigned int), Client& client, Stream& stream, WebSocketClient& webSocketClient) {
    this->_client = &client;
+   this->webSocketClient = &webSocketClient;
    this->callback = callback;
    this->domain = domain;
    this->port = port;
@@ -69,6 +74,13 @@ boolean PubSubClient::connect(char *id, char *user, char *pass, char* willTopic,
         result = _client->connect(this->ip, this->port);
       }
       
+	  
+		if (webSocketClient.handshake(_client)) {
+			Serial.println("Handshake successful");
+		} else {
+			Serial.println("Handshake failed.");	
+		}
+	  
       if (result) {
          nextMsgId = 1;
          uint8_t d[9] = {0x00,0x06,'M','Q','I','s','d','p',MQTTPROTOCOLVERSION};

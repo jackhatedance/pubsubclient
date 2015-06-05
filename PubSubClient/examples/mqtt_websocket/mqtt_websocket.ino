@@ -27,6 +27,7 @@ int port = 80;
 void callback(char* topic, byte* payload, unsigned int length);
 
 EthernetClient ethClient;
+WebSocketClient webSocketClient;
 PubSubClient client(server, port, callback, ethClient);
 
 // Callback function
